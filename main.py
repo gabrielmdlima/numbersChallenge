@@ -5,7 +5,7 @@ import keyboard
 MAIN_MENU = ('Play game', 'Choose difficulty', 'Instructions', 'Exit game', ' MAIN MENU ')
 DIFF_MENU = ('Easy', 'Medium', 'Hard', 'Back to Main Menu', ' CHOOSE DIFFICULTY ')
 INSTRUCTIONS_MENU = ('Back to Main Menu', 'Exit game', ' MENU ')
-SECONDARY_MENU = ('Play again', 'Back to Main Menu', 'Leave game', ' MENU ')
+SECONDARY_MENU = ('Play again', 'Back to Main Menu', ' Leave game ', ' MENU ')
 PAUSE_MENU = ('Resume game', 'Back to Main Menu', 'Leave game', ' PAUSE ')
 EASY = 4
 MEDIUM = 5
@@ -86,6 +86,10 @@ f"""
 
 def print_scoreboard():
   print('-=-'*18)
+  print('The numbers were: ', end='')
+  for i, number in enumerate(numbers):
+    print(number, end='')
+  print()
   print(
 f"""
 Congratulations! You win with {attempts} attempts!
@@ -103,7 +107,7 @@ def draw_numbers(difficulty):
   global numbers
   numbers = []
   for i in range(difficulty):
-    numbers.append(randint(1,9))
+    numbers.append(randint(0,9))
     if i == difficulty - 1:
       print(numbers[i])
     else:
@@ -233,18 +237,22 @@ def choice_processement(choice):
       choice = get_pressioned_key(MAIN_MENU)
       return choice_processement(choice)
     
-    elif choice == 'Leave game':
+    elif choice == ' Leave game ':
       main_title()
-      print('Thanks for playing! See you soon!')
+      print('Thanks for playing! See you soon!\n')
       return
   
   elif which_menu == 'pause':
-    play_game()
+    if choice == 'Resume game':
+      play_game()
+    elif choice == 'Leave game':
+      main_title()
+      print('The numbers were: ', end='')
+      for i, number in enumerate(numbers):
+        print(number, end='')
+      print('\n')
+      print('Thanks for playing! See you soon!\n')
   return
-
-
-# def player_attempt():
-  
 
 
 def play_game():
@@ -255,22 +263,26 @@ def play_game():
 
   while True:
     secondary_title()
-
-    for i, number in enumerate(numbers):
+    print('Press \033[1menter\033[m to \033[1mPAUSE\033[m')
+    
+    '''for i, number in enumerate(numbers):
       print(number, end='')
-    print()
+    print()'''
 
     if not attempts == 0:
+      print(f'{" GUESSES ":=^54}')
       for i in range(len(guesses)):
         print(f'Guess {i+1}: {guesses[i]}', end=' - ')
         print(f'{corrects[i]} corrects numbers!')
-      print()
+      print('='*54)
+    else:
+      print('='*54)
 
     if not len(player_choice) == len(numbers): 
       print(f'Input {player_choice} is invalid. Please try again!')
     
-    
-    player_choice = str(input(f'Guess {attempts+1} [Press enter to pause]: ')).strip()
+    print('Type here ↴')
+    player_choice = str(input(f'Guess {attempts+1}: ')).strip()
 
     count = 0
     if len(player_choice) == len(numbers):
@@ -289,9 +301,8 @@ def play_game():
     if player_choice == '':
       choice = get_pressioned_key(PAUSE_MENU)
       choice_processement(choice)
-      return  # CORRIGIR ISSO
+      return
 
-#  DESCOBRIR QUANDO GANHOU / DAR OPÇÃO DE SAIR
 
 def run():
   main_title()
@@ -299,7 +310,6 @@ def run():
 
   choice = get_pressioned_key(MAIN_MENU)
   choice_processement(choice)
-  print(numbers)
 
 
 if __name__ == '__main__':
