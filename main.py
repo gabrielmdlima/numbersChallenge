@@ -2,16 +2,22 @@ from os import system, name
 from random import randint
 import keyboard
 
-DIFF_MENU = ('Easy', 'Medium', 'Hard', 'Back to Main Menu', ' CHOOSE DIFFICULTY ')
 MAIN_MENU = ('Play game', 'Choose difficulty', 'Instructions', 'Exit game', ' MAIN MENU ')
-SECONDARY_MENU = ('Play again', 'Back to Main Menu', 'Exit game', ' MENU ')
+DIFF_MENU = ('Easy', 'Medium', 'Hard', 'Back to Main Menu', ' CHOOSE DIFFICULTY ')
 INSTRUCTIONS_MENU = ('Back to Main Menu', 'Exit game', ' MENU ')
+SECONDARY_MENU = ('Play again', 'Back to Main Menu', 'Leave game', ' MENU ')
+PAUSE_MENU = ('Resume game', 'Back to Main Menu', 'Leave game', ' PAUSE ')
 EASY = 4
 MEDIUM = 5
 HARD = 6
 
-global numbers
+global numbers, attempts
+global guesses
+global corrects
 numbers = []
+guesses = []
+corrects = []
+attempts = 0
 
 
 def main_title():
@@ -81,8 +87,8 @@ f"""
 def print_scoreboard():
   print('-=-'*18)
   print(
-"""
-Scoreboard here!
+f"""
+Congratulations! You win with {attempts} attempts!
 """
 )
   print('-=-'*18)
@@ -124,9 +130,6 @@ def print_menu(menu, selected):
       print(f'  {option:^50}  ')
   print('='*54)
 
-  for i, number in enumerate(numbers):
-    print(number, end='')
-
 
 def get_pressioned_key(menu):
   selected = 0
@@ -144,15 +147,17 @@ def get_pressioned_key(menu):
         selected = (selected + 1) % size
         print_menu(menu, selected)
       elif event.name == 'enter':
-        return menu[selected] 
+        return menu[selected]
 
 
 def choice_processement(choice):
+  global attempts, guesses, corrects
   menus = {
     'main': MAIN_MENU,
     'difficulty': DIFF_MENU,
     'secondary': SECONDARY_MENU,
-    'instructions': INSTRUCTIONS_MENU
+    'instructions': INSTRUCTIONS_MENU,
+    'pause': PAUSE_MENU
   }
 
   for name, menu in menus.items():
@@ -162,73 +167,99 @@ def choice_processement(choice):
 
   if which_menu == 'main':
     if choice == 'Play game':
-      return True
-    elif choice == 'Choose difficulty':
-      choice = get_pressioned_key(DIFF_MENU)
-      return choice_processement(choice)
-    elif choice == 'Instructions':
-      choice = get_pressioned_key(INSTRUCTIONS_MENU)
-      return choice_processement(choice)
-    elif choice == 'Exit game':
-      main_title()
-      print('See you soon!')
-      return False
-
-  elif which_menu == 'difficulty':
-    if choice == 'Easy':
-      draw_numbers(EASY)
-      choice = get_pressioned_key(DIFF_MENU)
-      return choice_processement(choice)
-    elif choice == 'Medium':
-      draw_numbers(MEDIUM)
-      choice = get_pressioned_key(DIFF_MENU)
-      return choice_processement(choice)
-    elif choice == 'Hard':
-      draw_numbers(HARD)
-      choice = get_pressioned_key(DIFF_MENU)
-      return choice_processement(choice)
-    elif choice == 'Back to Main Menu':
-      choice = get_pressioned_key(MAIN_MENU)
-      return choice_processement(choice)
-    
-  elif which_menu == 'secondary':
-    if choice == 'Play again':
       if len(numbers) == EASY:
         draw_numbers(EASY)
       elif len(numbers) == MEDIUM:
         draw_numbers(MEDIUM)
       elif len(numbers) == HARD:
         draw_numbers(HARD)
-      return True
-    elif choice == 'Back to Main Menu':
-      choice = get_pressioned_key(MAIN_MENU)
+
+      attempts = 0
+      guesses = []
+      corrects = []
+      play_game()
+      return
+    
+    elif choice == 'Choose difficulty':
+      choice = get_pressioned_key(DIFF_MENU)
       return choice_processement(choice)
-    elif choice == 'Exit game':
-      main_title()
-      print('Thanks for playing! See you soon!')
-      return False
-  
-  elif which_menu == 'instructions':
-    if choice == 'Back to Main Menu':
-      choice = get_pressioned_key(MAIN_MENU)
+    
+    elif choice == 'Instructions':
+      choice = get_pressioned_key(INSTRUCTIONS_MENU)
       return choice_processement(choice)
+    
     elif choice == 'Exit game':
       main_title()
       print('See you soon!')
-      return False
+      return
+
+  elif which_menu == 'difficulty':
+    if choice == 'Easy':
+      draw_numbers(EASY)
+      choice = get_pressioned_key(DIFF_MENU)
+      return choice_processement(choice)
+    
+    elif choice == 'Medium':
+      draw_numbers(MEDIUM)
+      choice = get_pressioned_key(DIFF_MENU)
+      return choice_processement(choice)
+    
+    elif choice == 'Hard':
+      draw_numbers(HARD)
+      choice = get_pressioned_key(DIFF_MENU)
+      return choice_processement(choice)
+    
+    elif choice == 'Back to Main Menu':
+      choice = get_pressioned_key(MAIN_MENU)
+      return choice_processement(choice)
+    
+  elif which_menu == 'secondary':
+    if choice == 'Play again':
+
+      if len(numbers) == EASY:
+        draw_numbers(EASY)
+      elif len(numbers) == MEDIUM:
+        draw_numbers(MEDIUM)
+      elif len(numbers) == HARD:
+        draw_numbers(HARD)
+      
+      guesses = []
+      corrects = []
+      attempts = 0
+      play_game()
+      return
+      
+    elif choice == 'Back to Main Menu':
+      choice = get_pressioned_key(MAIN_MENU)
+      return choice_processement(choice)
+    
+    elif choice == 'Leave game':
+      main_title()
+      print('Thanks for playing! See you soon!')
+      return
+  
+  elif which_menu == 'pause':
+    play_game()
   return
 
 
+# def player_attempt():
+  
+
+
 def play_game():
-  guesses = []
-  corrects = []
-  attempts = 0
-  player_choice = '0000'
+  global attempts, guesses, corrects
+  player_choice = ''
   while len(player_choice) < len(numbers): 
     player_choice += '0'
 
   while True:
     secondary_title()
+
+    for i, number in enumerate(numbers):
+      print(number, end='')
+    print()
+
     if not attempts == 0:
       for i in range(len(guesses)):
         print(f'Guess {i+1}: {guesses[i]}', end=' - ')
@@ -237,17 +268,28 @@ def play_game():
 
     if not len(player_choice) == len(numbers): 
       print(f'Input {player_choice} is invalid. Please try again!')
-    player_choice = str(input('Your guess: ')).strip()
+    
+    
+    player_choice = str(input(f'Guess {attempts+1} [Press enter to pause]: ')).strip()
+
+    count = 0
     if len(player_choice) == len(numbers):
       guesses.append(player_choice) 
-      count = 0
       for i, number in enumerate(numbers):
         if int(player_choice[i]) == number:
           count += 1
       corrects.append(count)
       attempts += 1
+
+    if count == len(numbers):
+      choice = get_pressioned_key(SECONDARY_MENU)
+      choice_processement(choice)
+      return
+    
     if player_choice == '':
-      return get_pressioned_key(SECONDARY_MENU)  # CORRIGIR ISSO
+      choice = get_pressioned_key(PAUSE_MENU)
+      choice_processement(choice)
+      return  # CORRIGIR ISSO
 
 #  DESCOBRIR QUANDO GANHOU / DAR OPÇÃO DE SAIR
 
@@ -256,11 +298,8 @@ def run():
   draw_numbers(EASY)
 
   choice = get_pressioned_key(MAIN_MENU)
-  play = choice_processement(choice)
+  choice_processement(choice)
   print(numbers)
-
-  if play:
-    play_game()
 
 
 if __name__ == '__main__':
