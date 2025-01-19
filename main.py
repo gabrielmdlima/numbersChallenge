@@ -6,7 +6,7 @@ MAIN_MENU = ('Play game', 'Choose difficulty', 'Instructions', 'Exit game', ' MA
 DIFF_MENU = ('Easy', 'Medium', 'Hard', 'Back to Main Menu', ' CHOOSE DIFFICULTY ')
 INSTRUCTIONS_MENU = ('Back to Main Menu', 'Exit game', ' MENU ')
 SECONDARY_MENU = ('Play again', 'Back to Main Menu', ' Leave game ', ' MENU ')
-PAUSE_MENU = ('Resume game', 'Back to Main Menu', 'Leave game', ' PAUSE ')
+PAUSE_MENU = ('Resume game', 'Restart game', 'Back to Main Menu', 'Leave game', ' PAUSE ')
 EASY = 4
 MEDIUM = 5
 HARD = 6
@@ -160,8 +160,10 @@ def print_menu(menu, selected):
   print(f'{menu[-1]:=^54}')
   for i, option in enumerate(menu):
     if i == selected:
-      print(f'\033[1m  {option:^50}  \033[m')
+      option = (f'\033[7;1;40m {option:^17} \033[m')
+      print(f'        {option:^50}  ')
     elif not i == len(menu) - 1:
+      option = (f'{option:^17}')
       print(f'  {option:^50}  ')
   print('='*54)
 
@@ -276,6 +278,7 @@ def choice_processement(choice):
   elif which_menu == 'pause':
     if choice == 'Resume game':
       play_game()
+    
     elif choice == 'Leave game':
       main_title()
       print('The numbers were: ', end='')
@@ -283,6 +286,20 @@ def choice_processement(choice):
         print(number, end='')
       print('\n')
       print('Thanks for playing! See you soon!\n')
+    
+    elif choice == 'Restart game':
+      if len(numbers) == EASY:
+        draw_numbers(EASY)
+      elif len(numbers) == MEDIUM:
+        draw_numbers(MEDIUM)
+      elif len(numbers) == HARD:
+        draw_numbers(HARD)
+      
+      guesses = []
+      corrects = []
+      attempts = 0
+      play_game()
+      return
   return
 
 
@@ -292,8 +309,16 @@ def play_game():
   while len(player_choice) < len(numbers): 
     player_choice += '0'
 
+  diff_levels = {
+    EASY: '\033[32mEasy\033[m',
+    MEDIUM: '\033[33mMedium\033[m',
+    HARD: '\033[31mHard\033[m'
+  }
+  difficulty = diff_levels.get(len(numbers))
+
   while True:
     secondary_title()
+    print(f'Difficulty: {difficulty}')
     print('Press \033[1menter\033[m to \033[1mPAUSE\033[m')
     
     '''for i, number in enumerate(numbers):
