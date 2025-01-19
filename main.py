@@ -187,8 +187,22 @@ def get_pressioned_key(menu):
         return menu[selected]
 
 
-def choice_processement(choice):
+def start_game():
   global attempts, guesses, corrects
+  if len(numbers) == EASY:
+        draw_numbers(EASY)
+  elif len(numbers) == MEDIUM:
+    draw_numbers(MEDIUM)
+  elif len(numbers) == HARD:
+    draw_numbers(HARD)
+  
+  guesses = []
+  corrects = []
+  attempts = 0
+  play_game()
+
+
+def choice_processement(choice):
   menus = {
     'main': MAIN_MENU,
     'difficulty': DIFF_MENU,
@@ -204,17 +218,7 @@ def choice_processement(choice):
 
   if which_menu == 'main':
     if choice == 'Play game':
-      if len(numbers) == EASY:
-        draw_numbers(EASY)
-      elif len(numbers) == MEDIUM:
-        draw_numbers(MEDIUM)
-      elif len(numbers) == HARD:
-        draw_numbers(HARD)
-
-      attempts = 0
-      guesses = []
-      corrects = []
-      play_game()
+      start_game()
       return
     
     elif choice == 'Choose difficulty':
@@ -252,18 +256,7 @@ def choice_processement(choice):
     
   elif which_menu == 'secondary':
     if choice == 'Play again':
-
-      if len(numbers) == EASY:
-        draw_numbers(EASY)
-      elif len(numbers) == MEDIUM:
-        draw_numbers(MEDIUM)
-      elif len(numbers) == HARD:
-        draw_numbers(HARD)
-      
-      guesses = []
-      corrects = []
-      attempts = 0
-      play_game()
+      start_game()
       return
       
     elif choice == 'Back to Main Menu':
@@ -288,17 +281,7 @@ def choice_processement(choice):
       print('Thanks for playing! See you soon!\n')
     
     elif choice == 'Restart game':
-      if len(numbers) == EASY:
-        draw_numbers(EASY)
-      elif len(numbers) == MEDIUM:
-        draw_numbers(MEDIUM)
-      elif len(numbers) == HARD:
-        draw_numbers(HARD)
-      
-      guesses = []
-      corrects = []
-      attempts = 0
-      play_game()
+      start_game()
       return
   return
 
