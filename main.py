@@ -55,8 +55,39 @@ def secondary_title():
 def print_instructions():
   print('-=-'*18)
   print(
-"""
-Instructions here!
+f"""
+  \033[1mINSTRUCTIONS\033[m
+
+  Welcome to Numbers Challenge! Your goal is to  
+  figure out the correct sequence of numbers  
+  generated randomly by the program. The game will  
+  only tell you \033[1mhow many numbers are in the correct  
+  position\033[m.  
+
+  \033[1mRULES:\033[m
+  1. Choose a difficulty level from the main menu:  
+    - \033[32mEasy\033[m: Sequence of {EASY} numbers.  
+    - \033[33mMedium\033[m: Sequence of {MEDIUM} numbers.  
+    - \033[31mHard\033[m: Sequence of {HARD} numbers.  
+  2. For each attempt, enter a sequence of numbers  
+    matching the length of the chosen difficulty.  
+  3. The game will check your guess and tell you  
+    \033[1mhow many numbers are in the correct position\033[m.  
+  4. Keep trying until you guess the entire sequence  
+    in the correct order.  
+
+  \033[1mCONTROLS:\033[m
+  - Use the "↑" and "↓" keys to navigate the menus.  
+  - Press "Enter" to confirm your selection.  
+  - During the game, press "Enter" to open the pause  
+    menu.  
+
+  \033[1mTIPS:\033[m
+  - Test different combinations of numbers to figure  
+    out their correct positions.  
+  - Use the game's feedback to refine your guesses.  
+
+  \033[1mGood luck and have fun!\033[m
 """
 )
   print('-=-'*18)
