@@ -139,10 +139,6 @@ def draw_numbers(difficulty):
   numbers = []
   for i in range(difficulty):
     numbers.append(randint(0,9))
-    if i == difficulty - 1:
-      print(numbers[i])
-    else:
-      print(numbers[i], end='')
 
 
 def print_menu(menu, selected):
