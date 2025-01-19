@@ -311,7 +311,7 @@ def play_game():
     if not attempts == 0:
       print(f'{" GUESSES ":=^54}')
       for i in range(len(guesses)):
-        print(f'Guess {i+1}: {guesses[i]}', end=' - ')
+        print(f'Guess {i+1:2}: {guesses[i]}', end=' - ')
         print(f'{corrects[i]} corrects numbers!')
       print('='*54)
     else:
@@ -321,7 +321,7 @@ def play_game():
       print(f'Input {player_choice} is invalid. Please try again!')
     
     print('Type here ↴')
-    player_choice = str(input(f'Guess {attempts+1}: ')).strip()
+    player_choice = str(input(f'Guess {attempts+1:2}: ')).strip()
 
     count = 0
     if len(player_choice) == len(numbers):
