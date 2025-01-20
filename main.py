@@ -157,6 +157,7 @@ def print_menu(menu, selected):
       print_scoreboard()  # Exibe o placar / Displays the scoreboard
   else:
     main_title()  # Exibe o título principal para o menu principal / Displays the main title for the main menu
+    print(f'{"↑ and ↓ keys to navigate.":^54}')
   
   # Exibe o título do menu com bordas formatadas / Displays the menu title with formatted borders
   print(f'{menu[-1]:=^54}')
