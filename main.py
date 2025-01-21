@@ -358,14 +358,16 @@ def play_game(data):
       data.corrects.append(count)  # Registra o número de acertos da tentativa. / Records the number of correct guesses for the attempt.
       data.set_attempts()  # Incrementa o contador de tentativas. / Increments the attempts counter.
 
-    if count == len(data.numbers):
       # Se todos os números estiverem corretos, o jogador venceu. / If all numbers are correct, the player has won.
+    if count == len(data.numbers):
+      data.selected = 0
       choice = get_pressioned_key(data, SECONDARY_MENU)
       choice_processement(data, choice)
       return
 
-    if data.player_choice == '':
       # Verifica se o jogador pressionou "Enter" para abrir o menu de pausa. / Checks if the player pressed "Enter" to open the pause menu.
+    if data.player_choice == '':
+      data.selected = 0
       choice = get_pressioned_key(data, PAUSE_MENU)
       choice_processement(data, choice)
       return
