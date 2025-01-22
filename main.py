@@ -24,7 +24,6 @@ class GameDataProcessesor:
     self.menus = self.set_menus_names()
 
     self.set_numbers(EASY)
-    self.set_player_choice()
 
   # Função para gerar os números aleatórios com base na dificuldade / Draws random numbers based on difficulty
   def set_numbers(self, difficulty):
