@@ -320,11 +320,13 @@ def choice_processement(data, choice):
 # Função para rodar o jogo principal / Runs the main game logic
 def play_game(data):
   data.set_player_choice()
+  sugestion = data.player_choice
 
   while True:
     secondary_title()
     # Mostra o nível de dificuldade atual. / Shows the current difficulty level.
     print(f'Difficulty: {data.currently_difficulty()}')
+    print(f'Sequence lenght: \033[1m{len(data.numbers)} digits\033[m')
     
     print('Press \033[1menter\033[m to \033[1mPAUSE\033[m')
 
@@ -341,12 +343,22 @@ def play_game(data):
         print(f'{data.corrects[i]} corrects numbers!')
     print('='*54)
 
-    # Valida se o input do jogador tem o tamanho correto. / Validates if the player's input has the correct length.
-    if not len(data.player_choice) == len(data.numbers):
-      print(f'Input {data.player_choice} is invalid. Please try again!\n')
+    while True:
+      # Valida se o input do jogador tem o tamanho correto. / Validates if the player's input has the correct length.
+      if not len(data.player_choice) == len(data.numbers):
+        print(f"Input '{data.player_choice}' is invalid. Please try a {len(data.numbers)}-numbers sequence!\n")
 
-    print('Type here ↴')
-    data.player_choice = str(input(f'Guess {data.attempts+1:2}: ')).strip()  # Solicita ao jogador que insira sua tentativa. / Asks the player to input their guess.
+      print(f"Type here ↴ Try '{sugestion}'" if data.attempts == 0 else 'Type here ↴')
+      data.player_choice = str(input(f'Guess {data.attempts+1:2}: ')).strip()  # Solicita ao jogador que insira sua tentativa. / Asks the player to input their guess.
+
+      # Verifica se o jogador pressionou "Enter" para abrir o menu de pausa. / Checks if the player pressed "Enter" to open the pause menu.
+      if data.player_choice == '':
+        data.selected = 0
+        choice = get_pressioned_key(data, PAUSE_MENU)
+        choice_processement(data, choice)
+        return
+      else:
+        break
 
     count = 0  # Inicializa o contador de números corretos para cada tentativa. / Initializes the correct number counter for each attempt.
     if len(data.player_choice) == len(data.numbers):
@@ -364,12 +376,6 @@ def play_game(data):
       choice_processement(data, choice)
       return
 
-      # Verifica se o jogador pressionou "Enter" para abrir o menu de pausa. / Checks if the player pressed "Enter" to open the pause menu.
-    if data.player_choice == '':
-      data.selected = 0
-      choice = get_pressioned_key(data, PAUSE_MENU)
-      choice_processement(data, choice)
-      return
 
 # Função que executa o jogo / Function that runs the game
 def run(data):
