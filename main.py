@@ -1,6 +1,6 @@
 from os import system, name
 from random import randint
-import keyboard
+from pynput.keyboard import Listener
 
 # Constantes para os menus / Menus constants
 MAIN_MENU = ('Play game', 'Choose difficulty', 'Instructions', 'Exit game', ' MAIN MENU ')
@@ -216,23 +216,36 @@ def print_menu(data, menu):
 
 # Função para capturar a entrada do teclado / Function to capture keyboard input
 def get_pressioned_key(data, menu):
-
+  
   # Exibe o menu inicial com a primeira opção selecionada / Displays the initial menu with the first option selected
   print_menu(data, menu)
 
   size = len(menu) - 1
+  selected_key = None
 
-  while True:
-    event = keyboard.read_event(suppress=True)
-    if event.event_type == 'down':
-      if event.name == 'up':
-        data.selected = (data.selected - 1) % size
-        print_menu(data, menu)
-      elif event.name == 'down':
-        data.selected = (data.selected + 1) % size
-        print_menu(data, menu)
-      elif event.name == 'enter':
-        return menu[data.selected]
+  def on_press(key):
+    nonlocal selected_key
+
+    if hasattr(key, 'name'):
+      key_name = key.name
+    else:
+      key_name = str(key)
+
+    if key_name == 'up':
+      data.selected = (data.selected - 1) % size
+      print_menu(data, menu)
+    elif key_name == 'down':
+      data.selected = (data.selected + 1) % size
+      print_menu(data, menu)
+    elif key_name == 'enter':
+      selected_key = menu[data.selected]
+      return False
+    
+  with Listener(on_press=on_press) as listener:
+    listener.join()
+
+  return selected_key
+
 
 # Função para processar a escolha do menu / Processes menu selection
 def choice_processement(data, choice):
