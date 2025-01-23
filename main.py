@@ -12,17 +12,11 @@ EASY = 4
 MEDIUM = 5
 HARD = 6
 
-# Classe resposável pelo processamento dos dados usados durante a execução do código
+# Classe responsável pelo processamento dos dados usados durante a execução do código / Class responsible for processing the data used during code execution.
 class GameDataProcessesor:
   def __init__(self):
-    self.numbers = []
-    self.guesses = []
-    self.corrects = []
-    self.attempts = 0
     self.selected = 0
-    self.player_choice = ''
     self.menus = self.set_menus_names()
-
     self.set_numbers(EASY)
 
   # Função para gerar os números aleatórios com base na dificuldade / Draws random numbers based on difficulty
@@ -54,9 +48,10 @@ class GameDataProcessesor:
 
   # Garante que o tamanho de player_choice seja igual ao da sequência de números. / Ensures that player_choice has the same length as the sequence of numbers.
   def set_player_choice(self):
-    if not len(self.numbers) == 0:
-      while len(self.player_choice) < len(self.numbers): 
-        self.player_choice += '0'
+    self.player_choice = ''    
+    while len(self.player_choice) < len(self.numbers): 
+      self.player_choice += '0'
+    self.sugestion = self.player_choice
 
   # Define os menus disponíveis e seus nomes / Defines available menus and their names
   def set_menus_names(self):
@@ -79,6 +74,7 @@ class GameDataProcessesor:
     elif size == HARD: 
       self.set_numbers(HARD)
 
+    self.set_player_choice()
     self.guesses = []
     self.corrects = []
     self.attempts = 0
@@ -317,59 +313,75 @@ def choice_processement(data, choice):
       play_game(data)
       return
 
+# Função para imprimir no console o display atual do jogo / Function to print the current game display to the console.
+def print_game_display(data):
+  secondary_title()
+  # Mostra o nível de dificuldade atual / Shows the current difficulty level
+  print(f'Difficulty: {data.currently_difficulty()}')
+  print(f'Sequence lenght: \033[1m{len(data.numbers)} digits\033[m')
+  
+  print('Press \033[1menter\033[m to \033[1mPAUSE\033[m')
+
+  # Debug opcional: Exibe os números gerados / Optional debug: Displays the generated numbers
+  '''for _, number in enumerate(data.numbers):
+    print(number, end='')
+  print()'''
+
+  # Exibe todas as tentativas anteriores, caso o jogador já tenha feito alguma / Displays all previous attempts if the player has made any
+  if not data.attempts == 0:
+    print(f'{" GUESSES ":=^54}')
+    for i in range(len(data.guesses)):
+      print(f'Guess {i+1:2}: {data.guesses[i]}', end=' - ')
+      print(f'{data.corrects[i]} corrects numbers!')
+  print('='*54)
+
 # Função para rodar o jogo principal / Runs the main game logic
 def play_game(data):
-  data.set_player_choice()
-  sugestion = data.player_choice
-
   while True:
-    secondary_title()
-    # Mostra o nível de dificuldade atual. / Shows the current difficulty level.
-    print(f'Difficulty: {data.currently_difficulty()}')
-    print(f'Sequence lenght: \033[1m{len(data.numbers)} digits\033[m')
-    
-    print('Press \033[1menter\033[m to \033[1mPAUSE\033[m')
-
-    # Debug opcional: Exibe os números gerados. / Optional debug: Displays the generated numbers.
-    '''for _, number in enumerate(data.numbers):
-      print(number, end='')
-    print()'''
-
-    # Exibe todas as tentativas anteriores, caso o jogador já tenha feito alguma. / Displays all previous attempts if the player has made any.
-    if not data.attempts == 0:
-      print(f'{" GUESSES ":=^54}')
-      for i in range(len(data.guesses)):
-        print(f'Guess {i+1:2}: {data.guesses[i]}', end=' - ')
-        print(f'{data.corrects[i]} corrects numbers!')
-    print('='*54)
-
+    print_game_display(data)
     while True:
-      # Valida se o input do jogador tem o tamanho correto. / Validates if the player's input has the correct length.
-      if not len(data.player_choice) == len(data.numbers):
-        print(f"Input '{data.player_choice}' is invalid. Please try a {len(data.numbers)}-numbers sequence!\n")
+      try:
+        # Solicita ao jogador que insira sua tentativa / Prompts the player to enter their guess.
+        print(f"Type here ↴ Try '{data.sugestion}'" if data.attempts == 0 else 'Type here ↴')
+        data.player_choice = str(input(f'Guess {data.attempts+1:2}: ')).strip()
 
-      print(f"Type here ↴ Try '{sugestion}'" if data.attempts == 0 else 'Type here ↴')
-      data.player_choice = str(input(f'Guess {data.attempts+1:2}: ')).strip()  # Solicita ao jogador que insira sua tentativa. / Asks the player to input their guess.
+        # Verifica se o jogador pressionou "Enter" para abrir o menu de pausa / Checks if the player pressed "Enter" to open the pause menu.
+        if data.player_choice == '':
+          data.selected = 0
+          choice = get_pressioned_key(data, PAUSE_MENU)
+          choice_processement(data, choice)
+          return
 
-      # Verifica se o jogador pressionou "Enter" para abrir o menu de pausa. / Checks if the player pressed "Enter" to open the pause menu.
-      if data.player_choice == '':
-        data.selected = 0
-        choice = get_pressioned_key(data, PAUSE_MENU)
-        choice_processement(data, choice)
-        return
-      else:
+        # Valida se o input do jogador tem o tamanho correto e se contém apenas números / Validates if the player's input has the correct length and contains only numbers.
+        if not data.player_choice.isdigit():
+          print_game_display(data)
+          raise ValueError(f"Input '{data.player_choice}' contains non-numeric characters. Please enter a {len(data.numbers)}-numbers sequence!\n")
+        elif not len(data.player_choice) == len(data.numbers):
+          print_game_display(data)
+          raise ValueError(f"Input '{data.player_choice}' is invalid. Please enter a {len(data.numbers)}-numbers sequence!\n")
+
+        # Se tudo estiver correto, interrompe o loop / If everything is correct, it breaks the loop.
         break
 
-    count = 0  # Inicializa o contador de números corretos para cada tentativa. / Initializes the correct number counter for each attempt.
-    if len(data.player_choice) == len(data.numbers):
-      data.guesses.append(data.player_choice)  # Adiciona a tentativa à lista de palpites. / Adds the attempt to the list of guesses.
-      for i, number in enumerate(data.numbers):
-        if int(data.player_choice[i]) == number:
-          count += 1
-      data.corrects.append(count)  # Registra o número de acertos da tentativa. / Records the number of correct guesses for the attempt.
-      data.set_attempts()  # Incrementa o contador de tentativas. / Increments the attempts counter.
+      # Trata a exceção e exibe a mensagem de erro / Catches the exception and displays the error message.
+      except ValueError as error:
+        print(error)
+        continue
 
-      # Se todos os números estiverem corretos, o jogador venceu. / If all numbers are correct, the player has won.
+      # Trata quaisquer outras exceções inesperadas / Catches any other unexpected exceptions.
+      except Exception as error:
+        print(f"An unexpected error occurred: {error}")
+        continue
+
+    count = 0  # Inicializa o contador de números corretos para cada tentativa. / Initializes the correct number counter for each attempt.
+    data.guesses.append(data.player_choice)  # Adiciona a tentativa à lista de palpites. / Adds the attempt to the list of guesses.
+    for i, number in enumerate(data.numbers):
+      if int(data.player_choice[i]) == number:
+        count += 1
+    data.corrects.append(count)  # Registra o número de acertos da tentativa. / Records the number of correct guesses for the attempt.
+    data.set_attempts()  # Incrementa o contador de tentativas. / Increments the attempts counter.
+
+    # Se todos os números estiverem corretos, o jogador venceu. / If all numbers are correct, the player has won.
     if count == len(data.numbers):
       data.selected = 0
       choice = get_pressioned_key(data, SECONDARY_MENU)
